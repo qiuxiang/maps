@@ -1,4 +1,4 @@
-name: maps
+name: map_view
 version: 0.0.1
 author: 7c00 <i@7c00.cc>
 
@@ -14,5 +14,5 @@ flutter:
   plugin:
     platforms:
       android:
-        package: qiuxiang.maps
-        pluginClass: MapsPlugin
+        package: qiuxiang.map_view
+        pluginClass: MapViewPlugin

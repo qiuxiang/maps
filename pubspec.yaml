@@ -11,8 +11,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   get:
-  maps:
-    path: maps
+  map_view:
+    path: map_view
 
 flutter:
   uses-material-design: true
