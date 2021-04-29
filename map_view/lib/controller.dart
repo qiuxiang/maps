@@ -36,4 +36,13 @@ class MapViewController {
     return CameraPosition.fromJson(
         await _channel.invokeMethod('getCameraPosition'));
   }
+
+  Future<Location> getLocation() async {
+    return Location.fromJson(await _channel.invokeMethod('getLocation'));
+  }
+
+  Future<void> moveCamera(CameraPosition position, [int duration = 500]) {
+    return _channel.invokeMethod(
+        'moveCamera', position.toJson()..addAll({'duration': duration}));
+  }
 }

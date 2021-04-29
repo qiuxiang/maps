@@ -10,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  get:
+  get: ^4.1.4
+  permission_handler: ^7.1.0
   map_view:
     path: map_view
 

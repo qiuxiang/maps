@@ -1,10 +1,7 @@
-import 'home.dart';
 import 'main.dart';
+import 'pages/home/home.dart';
 
 void app() {
-  // SystemChrome.setSystemUIOverlayStyle(
-  //   const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
-  // );
   runApp(App());
 }
 
@@ -14,7 +11,7 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'Maps',
       theme: lightTheme,
-      home: const Home(),
+      home: const HomePage(),
     );
   }
 

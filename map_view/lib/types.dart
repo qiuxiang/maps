@@ -11,9 +11,9 @@ class LatLng {
 
   const LatLng(this.latitude, this.longitude);
 
-  LatLng.fromJson(map)
-      : latitude = map['latitude'],
-        longitude = map['longitude'];
+  LatLng.fromJson(json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'];
 
   Map<String, double> toJson() =>
       {'latitude': latitude, 'longitude': longitude};
@@ -43,11 +43,11 @@ class CameraPosition {
 
   const CameraPosition({this.target, this.tilt, this.bearing, this.zoom});
 
-  CameraPosition.fromJson(map)
-      : target = LatLng.fromJson(map['target']),
-        tilt = map['tilt'],
-        bearing = map['bearing'],
-        zoom = map['zoom'];
+  CameraPosition.fromJson(json)
+      : target = LatLng.fromJson(json['target']),
+        tilt = json['tilt'],
+        bearing = json['bearing'],
+        zoom = json['zoom'];
 
   Map<String, Object?> toJson() => {
         'target': target?.toJson(),
@@ -67,4 +67,25 @@ class CameraPosition {
   @override
   int get hashCode =>
       target.hashCode ^ tilt.hashCode ^ bearing.hashCode ^ zoom.hashCode;
+}
+
+// ignore: avoid_classes_with_only_static_members
+class MapType {
+  static const int none = -1;
+  static const int normal = 1000;
+  static const int dark = 1008;
+  static const int trafficNavi = 1009;
+  static const int trafficNight = 1010;
+  static const int satellite = 1011;
+  static const int navi = 1012;
+  static const int night = 1013;
+}
+
+class Location {
+  final double latitude;
+  final double longitude;
+
+  Location.fromJson(json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'];
 }
