@@ -27,7 +27,7 @@ class HomePage extends GetxWidget<HomeState> {
           controller: state.secondaryPanel,
           minHeight: mainPanelMinHeight,
           maxHeight: maxHeight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
           panel: Material(
             color: Get.theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
