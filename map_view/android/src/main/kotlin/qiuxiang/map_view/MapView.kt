@@ -14,42 +14,21 @@ import com.tencent.tencentmap.mapsdk.maps.TencentMap
 import com.tencent.tencentmap.mapsdk.maps.model.CameraPosition
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_MAP_ROTATE_NO_CENTER
-import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import com.tencent.tencentmap.mapsdk.maps.MapView as TencentMapView
 
-class MapView(context: Context, messenger: BinaryMessenger, id: Int, arguments: Any?) :
-  PlatformView {
+class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : PlatformView {
   private val view = TencentMapView(context)
-  private val locationManager = TencentLocationManager.getInstance(context)
   lateinit var locationListener: OnLocationChangedListener
-  private val map: TencentMap = view.map
-  private val channel = MethodChannel(messenger, "map_view_$id")
+  val map: TencentMap = view.map
+  private val channel = MethodChannel(binding.binaryMessenger, "map_view_$id")
+  private val markers = HashMap<String, MapViewMarker>()
 
   init {
     view.onResume()
-
-    val locationRequest = TencentLocationRequest.create()
-    locationManager.requestLocationUpdates(locationRequest, object : TencentLocationListener {
-      override fun onStatusUpdate(name: String, status: Int, description: String) {}
-      override fun onLocationChanged(location: TencentLocation, error: Int, reason: String) {
-        locationListener.onLocationChanged(Location(location.provider).apply {
-          latitude = location.latitude
-          longitude = location.longitude
-          accuracy = location.accuracy
-          bearing = location.bearing
-        })
-      }
-    })
-    map.setLocationSource(object : LocationSource {
-      override fun deactivate() {}
-      override fun activate(listener: OnLocationChangedListener) {
-        locationListener = listener
-      }
-    })
-    map.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_MAP_ROTATE_NO_CENTER))
-    map.isMyLocationEnabled = true
+    initLocation()
 
     map.setOnMapClickListener {
       channel.invokeMethod("onTap", it.toJson())
@@ -106,8 +85,42 @@ class MapView(context: Context, messenger: BinaryMessenger, id: Int, arguments: 
           )
           result.success(null)
         }
+        "addMarker" -> {
+          val marker = MapViewMarker(this, call)
+          markers[marker.id] = marker
+          result.success(marker.id)
+        }
+        "removeMarker" -> {
+          markers[call.arguments]?.remove()
+          result.success(null)
+        }
+        else -> result.notImplemented()
       }
     }
+  }
+
+  private fun initLocation() {
+    val manager = TencentLocationManager.getInstance(binding.applicationContext)
+    val request = TencentLocationRequest.create()
+    manager.requestLocationUpdates(request, object : TencentLocationListener {
+      override fun onStatusUpdate(name: String, status: Int, description: String) {}
+      override fun onLocationChanged(location: TencentLocation, error: Int, reason: String) {
+        locationListener.onLocationChanged(Location(location.provider).apply {
+          latitude = location.latitude
+          longitude = location.longitude
+          accuracy = location.accuracy
+          bearing = location.bearing
+        })
+      }
+    })
+    map.setLocationSource(object : LocationSource {
+      override fun deactivate() {}
+      override fun activate(listener: OnLocationChangedListener) {
+        locationListener = listener
+      }
+    })
+    map.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_MAP_ROTATE_NO_CENTER))
+    map.isMyLocationEnabled = true
   }
 
   override fun getView(): View {

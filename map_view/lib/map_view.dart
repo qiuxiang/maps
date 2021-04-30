@@ -6,6 +6,7 @@ import 'controller.dart';
 import 'types.dart';
 
 export 'controller.dart';
+export 'marker.dart';
 export 'types.dart';
 
 class MapView extends StatefulWidget {

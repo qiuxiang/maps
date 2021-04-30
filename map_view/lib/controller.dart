@@ -1,10 +1,12 @@
 import 'package:flutter/services.dart';
 
 import 'map_view.dart';
+import 'marker.dart';
 
 class MapViewController {
   final MethodChannel _channel;
   final MapView widget;
+  final markers = <String, Marker>{};
 
   MapViewController(int id, this.widget)
       : _channel = MethodChannel('map_view_$id') {
@@ -51,5 +53,12 @@ class MapViewController {
   Future<void> moveCamera(CameraPosition position, [int duration = 500]) {
     return _channel.invokeMethod(
         'moveCamera', position.toJson()..addAll({'duration': duration}));
+  }
+
+  Future<Marker> addMarker(MarkerOptions options) async {
+    final id = await _channel.invokeMethod('addMarker', options.toJson());
+    final marker = Marker(this, id);
+    markers[id] = marker;
+    return marker;
   }
 }

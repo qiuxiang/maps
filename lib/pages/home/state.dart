@@ -11,6 +11,7 @@ class HomeState extends GetxController {
   final panel = PanelController();
   final fabPosition = mainPanelMinHeight.obs;
   final poi = Rx<MapPoi?>(null);
+  Marker? marker;
 
   @override
   void onInit() {
@@ -30,5 +31,7 @@ class HomeState extends GetxController {
     await panel.show();
     await secondaryPanel.hide();
     poi.value = null;
+    await marker?.remove();
+    marker = null;
   }
 }

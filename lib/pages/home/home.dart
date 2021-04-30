@@ -29,7 +29,7 @@ class HomePage extends GetxWidget<HomeState> {
           maxHeight: maxHeight,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           panel: Material(
-            color: Get.theme.cardColor,
+            color: Get.theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: const Poi(),
           ),

@@ -80,6 +80,13 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
           mapView.moveCamera(CameraPosition(target: poi.position), 200);
           state.panel.hide();
           state.secondaryPanel.show();
+          if (state.marker == null) {
+            mapView
+                .addMarker(MarkerOptions(position: poi.position))
+                .then((marker) => state.marker = marker);
+          } else {
+            state.marker?.update(MarkerOptions(position: poi.position));
+          }
         },
         onTap: (_) => state.hideSecondaryPanel(),
       ),

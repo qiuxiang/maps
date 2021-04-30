@@ -15,7 +15,7 @@ class MapViewPlugin : FlutterPlugin, MethodCallHandler {
     channel.setMethodCallHandler(this)
     binding.platformViewRegistry.registerViewFactory(
       "map_view",
-      MapViewFactory(binding.binaryMessenger)
+      MapViewFactory(binding)
     )
   }
 
