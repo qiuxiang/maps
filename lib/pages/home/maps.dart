@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/physics.dart';
 
 import '../../main.dart';
+import 'state.dart';
 
 class Maps extends StatefulWidget {
   const Maps();
@@ -75,7 +76,7 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
       },
       child: MapView(
         onCreated: (controller) {
-          Get.find<AppState>().mapView = controller;
+          Get.find<HomeState>().mapView = controller;
           mapView = controller;
         },
       ),

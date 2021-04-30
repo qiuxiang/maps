@@ -17,8 +17,7 @@ class App extends StatelessWidget {
 
   ThemeData get lightTheme {
     final theme = ThemeData(
-      primaryColor: const Color(0xff2670f3),
-      scaffoldBackgroundColor: const Color(0xfff5f5f5),
+      primaryColor: Colors.blue,
     );
     return theme.copyWith(
       appBarTheme: const AppBarTheme(
@@ -26,6 +25,15 @@ class App extends StatelessWidget {
         backgroundColor: Colors.white,
         backwardsCompatibility: false,
         elevation: 0.2,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: const TextStyle(fontSize: 14),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(width: 1, color: theme.dividerColor),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(width: 1, color: theme.primaryColor),
+        ),
       ),
     );
   }
