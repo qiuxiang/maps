@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/physics.dart';
 
 import '../../main.dart';
@@ -31,9 +29,6 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        animate.stop();
-      },
       onScaleStart: (event) async {
         animate.stop();
         dx = event.focalPoint.dx;
@@ -75,13 +70,23 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
         animate.animateWith(simulation);
       },
       child: MapView(
+        mapType: context.isDarkMode ? MapType.dark : MapType.normal,
         onCreated: (controller) {
-          Get.find<HomeState>().mapView = controller;
+          state.mapView = controller;
           mapView = controller;
         },
+        onTapPoi: (poi) {
+          state.poi.value = poi;
+          mapView.moveCamera(CameraPosition(target: poi.position), 200);
+          state.panel.hide();
+          state.secondaryPanel.show();
+        },
+        onTap: (_) => state.hideSecondaryPanel(),
       ),
     );
   }
+
+  HomeState get state => Get.find<HomeState>();
 
   void listener() {
     if (dx == 0 || dy == 0) {

@@ -11,14 +11,13 @@ class App extends StatelessWidget {
     return GetMaterialApp(
       title: 'Maps',
       theme: lightTheme,
+      darkTheme: darkTheme,
       home: const HomePage(),
     );
   }
 
   ThemeData get lightTheme {
-    final theme = ThemeData(
-      primaryColor: Colors.blue,
-    );
+    final theme = ThemeData();
     return theme.copyWith(
       appBarTheme: const AppBarTheme(
         foregroundColor: Colors.black87,
@@ -35,6 +34,12 @@ class App extends StatelessWidget {
           borderSide: BorderSide(width: 1, color: theme.primaryColor),
         ),
       ),
+    );
+  }
+
+  ThemeData get darkTheme {
+    return ThemeData.dark().copyWith(
+      appBarTheme: const AppBarTheme(backgroundColor: Color(0xff1d1d1d)),
     );
   }
 }

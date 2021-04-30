@@ -4,13 +4,20 @@ import 'map_view.dart';
 
 class MapViewController {
   final MethodChannel _channel;
+  final MapView widget;
 
-  MapViewController(int id) : _channel = MethodChannel('map_view_$id') {
+  MapViewController(int id, this.widget)
+      : _channel = MethodChannel('map_view_$id') {
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'onTap':
+          widget.onTap?.call(LatLng.fromJson(call.arguments));
           break;
         case 'onTapPoi':
+          widget.onTapPoi?.call(MapPoi.fromJson(call.arguments));
+          break;
+        case 'onLongPress':
+          widget.onLongPress?.call(LatLng.fromJson(call.arguments));
           break;
       }
     });

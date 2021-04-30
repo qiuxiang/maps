@@ -51,6 +51,16 @@ class MapView(context: Context, messenger: BinaryMessenger, id: Int, arguments: 
     map.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_MAP_ROTATE_NO_CENTER))
     map.isMyLocationEnabled = true
 
+    map.setOnMapClickListener {
+      channel.invokeMethod("onTap", it.toJson())
+    }
+    map.setOnMapPoiClickListener {
+      channel.invokeMethod("onTapPoi", it.toJson())
+    }
+    map.setOnMapLongClickListener {
+      channel.invokeMethod("onLongPress", it.toJson())
+    }
+
     channel.setMethodCallHandler { call, result ->
       when (call.method) {
         "setMapType" -> {
@@ -106,5 +116,9 @@ class MapView(context: Context, messenger: BinaryMessenger, id: Int, arguments: 
 
   override fun dispose() {
     view.onDestroy()
+  }
+
+  override fun onFlutterViewDetached() {
+    channel.setMethodCallHandler(null)
   }
 }

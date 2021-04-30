@@ -11,6 +11,7 @@ export 'package:flutter/material.dart';
 export 'package:flutter/services.dart';
 export 'package:get/get.dart' hide HeaderValue;
 export 'package:map_view/map_view.dart';
+export 'package:sliding_up_panel/sliding_up_panel.dart';
 
 export 'state.dart';
 export 'utils/utils.dart';

@@ -84,8 +84,19 @@ class MapType {
 class Location {
   final double latitude;
   final double longitude;
+  final double accuracy;
 
   Location.fromJson(json)
       : latitude = json['latitude'],
-        longitude = json['longitude'];
+        longitude = json['longitude'],
+        accuracy = json['accuracy'];
+}
+
+class MapPoi {
+  final LatLng position;
+  final String name;
+
+  MapPoi.fromJson(json)
+      : position = LatLng.fromJson(json['position']),
+        name = json['name'];
 }

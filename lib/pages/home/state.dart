@@ -1,14 +1,16 @@
-import 'package:sliding_up_panel/sliding_up_panel.dart';
-
 import '../../main.dart';
 
 enum HomeStateId { focus }
 
+const mainPanelMinHeight = 80.0;
+
 class HomeState extends GetxController {
   late MapViewController mapView;
   final focusNode = FocusNode();
+  final secondaryPanel = PanelController();
   final panel = PanelController();
-  final panelHeight = 0.0.obs;
+  final fabPosition = mainPanelMinHeight.obs;
+  final poi = Rx<MapPoi?>(null);
 
   @override
   void onInit() {
@@ -19,5 +21,14 @@ class HomeState extends GetxController {
         panel.open();
       }
     });
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      secondaryPanel.hide();
+    });
+  }
+
+  void hideSecondaryPanel() async {
+    await panel.show();
+    await secondaryPanel.hide();
+    poi.value = null;
   }
 }

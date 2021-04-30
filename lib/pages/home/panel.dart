@@ -14,7 +14,9 @@ class Panel extends GetxWidget<HomeState> {
           style: const TextStyle(fontSize: 20),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            fillColor: Get.theme.dividerColor,
+            fillColor: context.isDarkMode
+                ? Get.theme.cardColor
+                : Get.theme.dividerColor,
             filled: true,
             prefixIcon: GetBuilder<HomeState>(
               id: HomeStateId.focus,
@@ -26,10 +28,11 @@ class Panel extends GetxWidget<HomeState> {
                       state.focusNode.unfocus();
                     },
                     padding: EdgeInsets.zero,
-                    child: const Icon(Icons.arrow_back, color: Colors.black87),
+                    child: Icon(Icons.arrow_back,
+                        color: Get.textTheme.caption?.color),
                   );
                 }
-                return const Icon(Icons.search, color: Colors.black87);
+                return Icon(Icons.search, color: Get.textTheme.caption?.color);
               },
             ),
             focusedBorder: const OutlineInputBorder(

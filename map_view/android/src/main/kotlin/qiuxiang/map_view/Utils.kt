@@ -3,11 +3,19 @@ package qiuxiang.map_view
 import android.location.Location
 import com.tencent.tencentmap.mapsdk.maps.model.CameraPosition
 import com.tencent.tencentmap.mapsdk.maps.model.LatLng
+import com.tencent.tencentmap.mapsdk.maps.model.MapPoi
 
-private fun LatLng.toJson(): Map<String, *> {
+fun LatLng.toJson(): Map<String, *> {
   return mapOf(
     "latitude" to latitude,
     "longitude" to longitude,
+  )
+}
+
+fun MapPoi.toJson(): Map<String, *> {
+  return mapOf(
+    "position" to position.toJson(),
+    "name" to name,
   )
 }
 
