@@ -10,28 +10,33 @@ class Maps extends StatefulWidget {
   _MapsState createState() => _MapsState();
 }
 
-class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
+class _MapsState extends State<Maps> with TickerProviderStateMixin<Maps> {
   double dx = 0;
   double dy = 0;
   double scale = 0;
   double rotation = 0;
   CameraPosition? cameraPosition;
   late MapViewController mapView;
-  late AnimationController animate;
-  late Animation<FractionalOffset?> offset;
+  late AnimationController scrollAC;
+  late AnimationController zoomAC;
+  late Animation<FractionalOffset?> offsetA;
+  late Animation<double> zoomA;
   DateTime time = DateTime.now();
+  late double zoom;
 
   @override
   void initState() {
     super.initState();
-    animate = AnimationController(vsync: this);
+    scrollAC = AnimationController(vsync: this);
+    zoomAC = AnimationController(vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onScaleStart: (event) async {
-        animate.stop();
+        scrollAC.stop();
+
         dx = event.focalPoint.dx;
         dy = event.focalPoint.dy;
         scale = 0;
@@ -46,8 +51,8 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
         dy = event.focalPoint.dy;
 
         if (scale != 0 && cameraPosition != null) {
-          final zoom = log(event.scale) / log(2);
-          mapView.zoom(zoom + cameraPosition!.zoom!);
+          zoom = log(event.scale) / log(2) + cameraPosition!.zoom!;
+          mapView.zoom(zoom);
         }
         scale = event.scale;
         // if (rotation == 0 || cameraPosition == null) {
@@ -58,25 +63,18 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
       },
       onScaleEnd: (event) async {
         scale -= 1;
-        if (scale.abs() > 0.2) {
+        if (scale.abs() > 0.1) {
           time = DateTime.now();
-          return;
-          // cameraPosition = await mapView.getCameraPosition();
-          // final tween = Tween(
-          //   begin: cameraPosition!.zoom,
-          //   end: cameraPosition!.zoom! + scale.sign,
-          // );
-          // final zoom = animate.drive(tween);
-          // zoom.addListener(() {
-          //   // mapView.zoom(zoom.value!);
-          // });
-          // const spring = SpringDescription(mass: 20, stiffness: 1, damping: 1);
-          // animate.reset();
-          // return animate.animateWith(SpringSimulation(spring, 0, 1, 1));
+          final tween = Tween(begin: zoom, end: zoom + scale.sign / 2);
+          zoomA = zoomAC.drive(tween);
+          zoomA.removeListener(zoomListener);
+          zoomA.addListener(zoomListener);
+          const spring = SpringDescription(mass: 50, stiffness: 1, damping: 1);
+          return zoomAC.animateWith(SpringSimulation(spring, 0, 1, 1));
         }
 
         final now = DateTime.now().millisecondsSinceEpoch;
-        if (now - time.millisecondsSinceEpoch < 1000) {
+        if (now - time.millisecondsSinceEpoch < 100) {
           return;
         }
 
@@ -87,15 +85,16 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
         );
         dx = 0;
         dy = 0;
-        offset = tween.animate(
-            CurvedAnimation(parent: animate, curve: Curves.easeOutCubic));
-        offset.removeListener(offsetListener);
-        offset.addListener(offsetListener);
-        animate.reset();
         final duration =
             event.velocity.pixelsPerSecond.distance ~/ Get.pixelRatio;
-        animate.duration = Duration(milliseconds: duration);
-        await animate.forward();
+        offsetA = tween.animate(CurvedAnimation(
+            parent: scrollAC,
+            curve: Cubic(0, min(duration / 1000, 0.9), 0.5, 1)));
+        offsetA.removeListener(scrollListener);
+        offsetA.addListener(scrollListener);
+        scrollAC.reset();
+        scrollAC.duration = Duration(milliseconds: duration);
+        await scrollAC.forward();
       },
       child: MapView(
         mapType: context.isDarkMode ? MapType.dark : MapType.normal,
@@ -121,17 +120,21 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
     );
   }
 
-  void offsetListener() {
+  void zoomListener() {
+    mapView.zoom(zoomA.value);
+  }
+
+  void scrollListener() {
     if (dx == 0 || dy == 0) {
-      dx = offset.value!.dx;
-      dy = offset.value!.dy;
+      dx = offsetA.value!.dx;
+      dy = offsetA.value!.dy;
       return;
     }
-    final x = offset.value!.dx - dx;
-    final y = offset.value!.dy - dy;
+    final x = offsetA.value!.dx - dx;
+    final y = offsetA.value!.dy - dy;
     mapView.scroll(x, y);
-    dx = offset.value!.dx;
-    dy = offset.value!.dy;
+    dx = offsetA.value!.dx;
+    dy = offsetA.value!.dy;
   }
 
   HomeState get state => Get.find<HomeState>();

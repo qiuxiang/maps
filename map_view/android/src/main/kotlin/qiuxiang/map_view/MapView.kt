@@ -29,6 +29,11 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
   init {
     view.onResume()
     initLocation()
+    
+    map.uiSettings.isZoomGesturesEnabled = false;
+    map.uiSettings.isScrollGesturesEnabled = false;
+    map.uiSettings.isRotateGesturesEnabled = false;
+    map.uiSettings.isTiltGesturesEnabled = false;
 
     map.setOnMapClickListener {
       channel.invokeMethod("onTap", it.toJson())
