@@ -19,6 +19,7 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
   late MapViewController mapView;
   late AnimationController animate;
   late Animation<FractionalOffset?> offset;
+  DateTime time = DateTime.now();
 
   @override
   void initState() {
@@ -44,19 +45,41 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
         dx = event.focalPoint.dx;
         dy = event.focalPoint.dy;
 
-        if (scale == 0 || cameraPosition == null) {
-          scale = event.scale;
-        } else {
+        if (scale != 0 && cameraPosition != null) {
           final zoom = log(event.scale) / log(2);
           mapView.zoom(zoom + cameraPosition!.zoom!);
         }
+        scale = event.scale;
         // if (rotation == 0 || cameraPosition == null) {
         //   rotation = event.rotation;
         // } else {
         //   mapView.rotate(event.rotation * 180 / pi);
         // }
       },
-      onScaleEnd: (event) {
+      onScaleEnd: (event) async {
+        scale -= 1;
+        if (scale.abs() > 0.2) {
+          time = DateTime.now();
+          return;
+          // cameraPosition = await mapView.getCameraPosition();
+          // final tween = Tween(
+          //   begin: cameraPosition!.zoom,
+          //   end: cameraPosition!.zoom! + scale.sign,
+          // );
+          // final zoom = animate.drive(tween);
+          // zoom.addListener(() {
+          //   // mapView.zoom(zoom.value!);
+          // });
+          // const spring = SpringDescription(mass: 20, stiffness: 1, damping: 1);
+          // animate.reset();
+          // return animate.animateWith(SpringSimulation(spring, 0, 1, 1));
+        }
+
+        final now = DateTime.now().millisecondsSinceEpoch;
+        if (now - time.millisecondsSinceEpoch < 1000) {
+          return;
+        }
+
         final velocity = event.velocity.pixelsPerSecond;
         final tween = FractionalOffsetTween(
           begin: const FractionalOffset(0, 0),
@@ -64,10 +87,15 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
         );
         dx = 0;
         dy = 0;
-        final simulation = FrictionSimulation(1e-6, 0, velocity.distance / 500);
-        offset = animate.drive(tween);
-        offset.addListener(listener);
-        animate.animateWith(simulation);
+        offset = tween.animate(
+            CurvedAnimation(parent: animate, curve: Curves.easeOutCubic));
+        offset.removeListener(offsetListener);
+        offset.addListener(offsetListener);
+        animate.reset();
+        final duration =
+            event.velocity.pixelsPerSecond.distance ~/ Get.pixelRatio;
+        animate.duration = Duration(milliseconds: duration);
+        await animate.forward();
       },
       child: MapView(
         mapType: context.isDarkMode ? MapType.dark : MapType.normal,
@@ -93,9 +121,7 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
     );
   }
 
-  HomeState get state => Get.find<HomeState>();
-
-  void listener() {
+  void offsetListener() {
     if (dx == 0 || dy == 0) {
       dx = offset.value!.dx;
       dy = offset.value!.dy;
@@ -107,4 +133,6 @@ class _MapsState extends State<Maps> with SingleTickerProviderStateMixin<Maps> {
     dx = offset.value!.dx;
     dy = offset.value!.dy;
   }
+
+  HomeState get state => Get.find<HomeState>();
 }
