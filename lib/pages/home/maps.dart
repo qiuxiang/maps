@@ -85,11 +85,10 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin<Maps> {
         );
         dx = 0;
         dy = 0;
-        final duration = max(
-            event.velocity.pixelsPerSecond.distance ~/ Get.pixelRatio, 1000);
-        final v = min(duration / 1000, 0.9);
-        offsetA = tween.animate(
-            CurvedAnimation(parent: scrollAC, curve: Cubic(0, v, v / 2, 1)));
+        final duration = max(event.velocity.pixelsPerSecond.distance ~/ 2, 800);
+        final v = min(duration / 2000, 1.0);
+        offsetA = tween.animate(CurvedAnimation(
+            parent: scrollAC, curve: Cubic(0.15, v, v / 2, 0.95)));
         offsetA.removeListener(scrollListener);
         offsetA.addListener(scrollListener);
         scrollAC.reset();
