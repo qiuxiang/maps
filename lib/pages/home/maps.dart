@@ -104,11 +104,14 @@ class _MapsState extends State<Maps> with TickerProviderStateMixin<Maps> {
         onTapPoi: (poi) {
           state.poi.value = poi;
           mapView.moveCamera(CameraPosition(target: poi.position), 200);
-          state.panel.hide();
+          state.mainPanel.hide();
           state.secondaryPanel.show();
           if (state.marker == null) {
             mapView
-                .addMarker(MarkerOptions(position: poi.position))
+                .addMarker(MarkerOptions(
+                  position: poi.position,
+                  asset: 'asset/marker.png',
+                ))
                 .then((marker) => state.marker = marker);
           } else {
             state.marker?.update(MarkerOptions(position: poi.position));

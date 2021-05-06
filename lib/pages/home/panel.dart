@@ -1,8 +1,8 @@
 import '../../main.dart';
 import 'state.dart';
 
-class Panel extends GetxWidget<HomeState> {
-  const Panel();
+class MainPanel extends GetxWidget<HomeState> {
+  const MainPanel();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class Panel extends GetxWidget<HomeState> {
                 if (state.focusNode.hasFocus) {
                   return CupertinoButton(
                     onPressed: () {
-                      state.panel.close();
+                      state.mainPanel.close();
                       state.focusNode.unfocus();
                     },
                     padding: EdgeInsets.zero,

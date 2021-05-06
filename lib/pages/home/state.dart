@@ -7,8 +7,8 @@ const mainPanelMinHeight = 80.0;
 class HomeState extends GetxController {
   late MapViewController mapView;
   final focusNode = FocusNode();
+  final mainPanel = PanelController();
   final secondaryPanel = PanelController();
-  final panel = PanelController();
   final fabPosition = mainPanelMinHeight.obs;
   final poi = Rx<MapPoi?>(null);
   Marker? marker;
@@ -19,7 +19,7 @@ class HomeState extends GetxController {
     focusNode.addListener(() {
       update([HomeStateId.focus]);
       if (focusNode.hasFocus) {
-        panel.open();
+        mainPanel.open();
       }
     });
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
@@ -28,7 +28,7 @@ class HomeState extends GetxController {
   }
 
   void hideSecondaryPanel() async {
-    await panel.show();
+    await mainPanel.show();
     await secondaryPanel.hide();
     poi.value = null;
     await marker?.remove();
