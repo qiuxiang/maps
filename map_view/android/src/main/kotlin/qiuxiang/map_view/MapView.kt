@@ -1,6 +1,7 @@
 package qiuxiang.map_view
 
 import android.content.Context
+import android.graphics.Point
 import android.location.Location
 import android.view.View
 import com.tencent.map.geolocation.TencentLocation
@@ -29,6 +30,11 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
   init {
     view.onResume()
     initLocation()
+
+    map.uiSettings.isScrollGesturesEnabled = false
+    map.uiSettings.isZoomGesturesEnabled = false
+    map.uiSettings.isTiltGesturesEnabled = false
+    map.uiSettings.isRotateGesturesEnabled = false
 
     map.setOnMapClickListener {
       channel.invokeMethod("onTap", it.toJson())
@@ -68,21 +74,23 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
         }
         "moveCamera" -> {
           val default = map.cameraPosition
-          map.animateCamera(
-            CameraUpdateFactory.newCameraPosition(
-              CameraPosition(
-                call.argument<Map<String, Double>>("target")?.toLatLng() ?: default.target,
-                call.argument<Double>("zoom")?.toFloat() ?: default.zoom,
-                call.argument<Double>("tilt")?.toFloat() ?: default.tilt,
-                call.argument<Double>("bearing")?.toFloat() ?: default.bearing,
-              )
-            ),
-            call.argument<Int>("duration")?.toLong() ?: 1000,
-            object : TencentMap.CancelableCallback {
+          val duration = call.argument<Int>("duration")?.toLong() ?: 0;
+          val position = CameraUpdateFactory.newCameraPosition(
+            CameraPosition(
+              call.argument<Map<String, Double>>("target")?.toLatLng() ?: default.target,
+              call.argument<Double>("zoom")?.toFloat() ?: default.zoom,
+              call.argument<Double>("tilt")?.toFloat() ?: default.tilt,
+              call.argument<Double>("bearing")?.toFloat() ?: default.bearing,
+            )
+          )
+          if (duration == 0L) {
+            map.moveCamera(position);
+          } else {
+            map.animateCamera(position, duration, object : TencentMap.CancelableCallback {
               override fun onFinish() {}
               override fun onCancel() {}
-            }
-          )
+            })
+          }
           result.success(null)
         }
         "addMarker" -> {

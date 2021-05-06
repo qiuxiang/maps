@@ -89,7 +89,6 @@ class HomePage extends GetxWidget<HomeState> {
 
   void toLocation() async {
     final location = await state.mapView.getLocation();
-    await state.mapView.moveCamera(CameraPosition(
-        target: LatLng(location.latitude, location.longitude), zoom: 16));
+    state.mapView.animateScroll(LatLng(location.latitude, location.longitude));
   }
 }
