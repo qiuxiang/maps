@@ -1,3 +1,4 @@
+import 'package:flutter/animation.dart';
 import 'package:flutter/services.dart';
 
 import 'map_view.dart';
@@ -63,7 +64,8 @@ class MapViewController {
     return marker;
   }
 
-  void animateScroll(LatLng target, [int duration = 1000]) {
-    state.animateScroll(target, duration);
+  void animateScroll(LatLng target,
+      [int duration = 1000, Curve curve = Curves.easeOutCubic]) {
+    state.animateScroll(target, duration, curve);
   }
 }

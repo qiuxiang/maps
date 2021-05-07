@@ -13,15 +13,14 @@ class Maps extends GetxWidget<HomeState> {
       },
       onTapPoi: (poi) {
         state.poi.value = poi;
-        state.mapView.animateScroll(poi.position);
+        state.mapView.animateScroll(poi.position, 600);
         state.mainPanel.hide();
         state.secondaryPanel.show();
         if (state.marker == null) {
+          final options =
+              MarkerOptions(position: poi.position, asset: 'asset/marker.png');
           state.mapView
-              .addMarker(MarkerOptions(
-                position: poi.position,
-                asset: 'asset/marker.png',
-              ))
+              .addMarker(options)
               .then((marker) => state.marker = marker);
         } else {
           state.marker?.update(MarkerOptions(position: poi.position));

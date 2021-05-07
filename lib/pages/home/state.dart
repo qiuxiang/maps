@@ -22,9 +22,6 @@ class HomeState extends GetxController {
         mainPanel.open();
       }
     });
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      secondaryPanel.hide();
-    });
   }
 
   void hideSecondaryPanel() async {

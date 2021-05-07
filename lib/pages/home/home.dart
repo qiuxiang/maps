@@ -89,6 +89,7 @@ class HomePage extends GetxWidget<HomeState> {
 
   void toLocation() async {
     final location = await state.mapView.getLocation();
-    state.mapView.animateScroll(LatLng(location.latitude, location.longitude));
+    state.mapView.animateScroll(LatLng(location.latitude, location.longitude),
+        600, Curves.easeInOutSine);
   }
 }

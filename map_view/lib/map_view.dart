@@ -146,9 +146,10 @@ class MapViewState extends State<MapView> with TickerProviderStateMixin {
     }
   }
 
-  void animateScroll(LatLng target, [int duration = 1000]) async {
+  void animateScroll(LatLng target,
+      [int duration = 1000, Curve curve = Curves.easeOutCubic]) async {
     final position = await controller.getCameraPosition();
-    _animateScroll(position.target!, target, _scrollListener, duration);
+    _animateScroll(position.target!, target, _scrollListener, duration, curve);
   }
 
   void _animateScroll(LatLng begin, LatLng end, void Function() listener,
@@ -157,9 +158,7 @@ class MapViewState extends State<MapView> with TickerProviderStateMixin {
       begin: Alignment(begin.latitude, begin.longitude),
       end: Alignment(end.latitude, end.longitude),
     );
-    _aScroll = tween.animate(
-      CurvedAnimation(parent: _acScroll, curve: Curves.easeOutCubic),
-    );
+    _aScroll = tween.animate(CurvedAnimation(parent: _acScroll, curve: curve));
     _aScroll?.removeListener(_scaleEndScrollListener);
     _aScroll?.removeListener(_scrollListener);
     _aScroll?.addListener(listener);

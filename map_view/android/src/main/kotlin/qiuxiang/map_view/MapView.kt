@@ -1,7 +1,11 @@
 package qiuxiang.map_view
 
 import android.content.Context
-import android.graphics.Point
+import android.content.Context.SENSOR_SERVICE
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.view.View
 import com.tencent.map.geolocation.TencentLocation
@@ -14,15 +18,18 @@ import com.tencent.tencentmap.mapsdk.maps.LocationSource.OnLocationChangedListen
 import com.tencent.tencentmap.mapsdk.maps.TencentMap
 import com.tencent.tencentmap.mapsdk.maps.model.CameraPosition
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
-import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_MAP_ROTATE_NO_CENTER
+import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import kotlin.math.PI
 import com.tencent.tencentmap.mapsdk.maps.MapView as TencentMapView
 
-class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : PlatformView {
+class MapView(
+  private val context: Context, val binding: FlutterPluginBinding, id: Int
+) : PlatformView {
+  private var location: Location? = null
   private val view = TencentMapView(context)
-  lateinit var locationListener: OnLocationChangedListener
   val map: TencentMap = view.map
   private val channel = MethodChannel(binding.binaryMessenger, "map_view_$id")
   private val markers = HashMap<String, MapViewMarker>()
@@ -74,7 +81,7 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
         }
         "moveCamera" -> {
           val default = map.cameraPosition
-          val duration = call.argument<Int>("duration")?.toLong() ?: 0;
+          val duration = call.argument<Int>("duration")?.toLong() ?: 0
           val position = CameraUpdateFactory.newCameraPosition(
             CameraPosition(
               call.argument<Map<String, Double>>("target")?.toLatLng() ?: default.target,
@@ -84,7 +91,7 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
             )
           )
           if (duration == 0L) {
-            map.moveCamera(position);
+            map.moveCamera(position)
           } else {
             map.animateCamera(position, duration, object : TencentMap.CancelableCallback {
               override fun onFinish() {}
@@ -108,17 +115,53 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
   }
 
   private fun initLocation() {
+    lateinit var locationListener: OnLocationChangedListener
+    var accelerometer: FloatArray? = null
+    var magnetic: FloatArray? = null
+    val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
+    fun registerListener(type: Int) {
+      sensorManager.registerListener(
+        object : SensorEventListener {
+          override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+          override fun onSensorChanged(event: SensorEvent) {
+            if (type == Sensor.TYPE_ACCELEROMETER) {
+              accelerometer = event.values
+            }
+            if (type == Sensor.TYPE_MAGNETIC_FIELD) {
+              magnetic = event.values
+            }
+            if (magnetic != null && accelerometer != null) {
+              val r = FloatArray(9)
+              val i = FloatArray(9)
+              if (SensorManager.getRotationMatrix(r, i, accelerometer, magnetic)) {
+                val orientation = FloatArray(3)
+                SensorManager.getOrientation(r, orientation)
+                location?.apply {
+                  bearing = ((orientation[0] * 180 / PI + 360) % 360).toFloat()
+                }?.let { locationListener.onLocationChanged(it) }
+              }
+            }
+          }
+        },
+        sensorManager.getDefaultSensor(type),
+        SensorManager.SENSOR_DELAY_UI,
+      )
+    }
+    registerListener(Sensor.TYPE_ACCELEROMETER)
+    registerListener(Sensor.TYPE_MAGNETIC_FIELD)
+
     val manager = TencentLocationManager.getInstance(binding.applicationContext)
     val request = TencentLocationRequest.create()
     manager.requestLocationUpdates(request, object : TencentLocationListener {
       override fun onStatusUpdate(name: String, status: Int, description: String) {}
-      override fun onLocationChanged(location: TencentLocation, error: Int, reason: String) {
-        locationListener.onLocationChanged(Location(location.provider).apply {
-          latitude = location.latitude
-          longitude = location.longitude
-          accuracy = location.accuracy
-          bearing = location.bearing
-        })
+      override fun onLocationChanged(value: TencentLocation, error: Int, reason: String) {
+        location = Location(value.provider).apply {
+          latitude = value.latitude
+          longitude = value.longitude
+          accuracy = value.accuracy
+          bearing = location?.bearing ?: 0f
+        }
+        locationListener.onLocationChanged(location)
       }
     })
     map.setLocationSource(object : LocationSource {
@@ -127,7 +170,7 @@ class MapView(context: Context, val binding: FlutterPluginBinding, id: Int) : Pl
         locationListener = listener
       }
     })
-    map.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_MAP_ROTATE_NO_CENTER))
+    map.setMyLocationStyle(MyLocationStyle().myLocationType(LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER))
     map.isMyLocationEnabled = true
   }
 
