@@ -13,8 +13,14 @@ dependencies:
   get: ^4.1.4
   permission_handler: ^7.1.0
   sliding_up_panel: ^2.0.0+1
+  http: ^0.13.3
+  crypto: ^3.0.1
   map_view:
     path: map_view
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true

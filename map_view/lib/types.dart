@@ -24,6 +24,9 @@ class LatLng {
 
   @override
   int get hashCode => latitude.hashCode ^ longitude.hashCode;
+
+  @override
+  String toString() => '$latitude,$longitude';
 }
 
 /// 地图状态

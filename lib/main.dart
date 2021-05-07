@@ -13,6 +13,7 @@ export 'package:get/get.dart' hide HeaderValue;
 export 'package:map_view/map_view.dart';
 export 'package:sliding_up_panel/sliding_up_panel.dart';
 
+export 'map_service.dart';
 export 'state.dart';
 export 'utils/utils.dart';
 export 'widgets/widgets.dart';
