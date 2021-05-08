@@ -38,8 +38,9 @@ class HomePage extends GetxWidget<HomeState> {
           ),
           body: SlidingUpPanel(
             controller: state.secondaryPanel,
-            minHeight: mainPanelMinHeight,
+            minHeight: secondaryPanelMinHeight,
             maxHeight: maxHeight,
+            isDraggable: false,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             panel: Material(
               color: Get.theme.scaffoldBackgroundColor,
@@ -73,11 +74,12 @@ class HomePage extends GetxWidget<HomeState> {
             ]),
             onPanelSlide: (position) {
               state.fabPosition.value =
-                  maxHeight * position + mainPanelMinHeight;
+                  maxHeight * position + state.panelMinHeight;
             },
           ),
           onPanelSlide: (position) {
-            state.fabPosition.value = maxHeight * position + mainPanelMinHeight;
+            state.fabPosition.value =
+                maxHeight * position + state.panelMinHeight;
           },
           onPanelClosed: () {
             state.focusNode.unfocus();

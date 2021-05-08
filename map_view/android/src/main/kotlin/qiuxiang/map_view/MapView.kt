@@ -138,7 +138,10 @@ class MapView(
                 SensorManager.getOrientation(r, orientation)
                 location?.apply {
                   bearing = ((orientation[0] * 180 / PI + 360) % 360).toFloat()
-                }?.let { locationListener.onLocationChanged(it) }
+                }?.let {
+                  locationListener.onLocationChanged(it)
+                  channel.invokeMethod("onLocation", it.toJson())
+                }
               }
             }
           }

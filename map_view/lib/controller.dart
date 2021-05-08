@@ -9,6 +9,7 @@ class MapViewController {
   final MethodChannel _channel;
   final MapViewState state;
   final markers = <String, Marker>{};
+  CameraPosition? cameraPosition;
 
   MapViewController(int id, this.state)
       : _channel = MethodChannel('map_view_$id') {
@@ -22,6 +23,9 @@ class MapViewController {
           break;
         case 'onLongPress':
           state.widget.onLongPress?.call(LatLng.fromJson(call.arguments));
+          break;
+        case 'onLocation':
+          state.widget.onLocation?.call(Location.fromJson(call.arguments));
           break;
       }
     });

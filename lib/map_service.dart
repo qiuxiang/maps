@@ -21,6 +21,10 @@ Future reGeocode(LatLng latLng) async {
   return request('geocoder/v1', {'location': '$latLng'});
 }
 
+Future geocode(String address) async {
+  return request('geocoder/v1', {'address': address});
+}
+
 Future getSuggestions(String keyword, String region) async {
   return request('place/v1/suggestion', {'keyword': keyword, 'region': region});
 }

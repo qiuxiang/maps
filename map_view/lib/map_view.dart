@@ -30,12 +30,16 @@ class MapView extends StatefulWidget {
   /// 长按地图时调用
   final void Function(LatLng)? onLongPress;
 
+  /// 定位改变时调用
+  final void Function(Location)? onLocation;
+
   const MapView({
     this.mapType = MapType.none,
     this.onCreated,
     this.onTap,
     this.onTapPoi,
     this.onLongPress,
+    this.onLocation,
   });
 
   @override
@@ -44,7 +48,6 @@ class MapView extends StatefulWidget {
 
 class MapViewState extends State<MapView> with TickerProviderStateMixin {
   late MapViewController controller;
-  CameraPosition? cameraPosition;
   late double pixelRatio;
 
   // double _rotation = 0;
@@ -77,15 +80,15 @@ class MapViewState extends State<MapView> with TickerProviderStateMixin {
         _offset = event.focalPoint;
         _scale = 0;
         // _rotation = 0;
-        cameraPosition = await controller.getCameraPosition();
+        controller.cameraPosition = await controller.getCameraPosition();
       },
       onScaleUpdate: (event) {
         final point = event.focalPoint - _offset;
         _offset = event.focalPoint;
         controller.scroll(point.dx * pixelRatio, point.dy * pixelRatio);
 
-        if (_scale != 0 && cameraPosition != null) {
-          _zoom = log(event.scale) / log(2) + cameraPosition!.zoom!;
+        if (_scale != 0 && controller.cameraPosition != null) {
+          _zoom = log(event.scale) / log(2) + controller.cameraPosition!.zoom!;
           controller.zoom(_zoom);
         }
         _scale = event.scale;

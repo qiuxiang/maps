@@ -1,7 +1,9 @@
 import '../main.dart';
 
 export 'align.dart';
+export 'loading.dart';
 export 'page.dart';
+export 'rounded_button.dart';
 
 abstract class GetxWidget<T> extends StatelessWidget {
   const GetxWidget({Key? key}) : super(key: key);

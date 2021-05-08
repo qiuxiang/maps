@@ -99,6 +99,8 @@ class MapPoi {
   final LatLng position;
   final String name;
 
+  MapPoi(this.position, this.name);
+
   MapPoi.fromJson(json)
       : position = LatLng.fromJson(json['position']),
         name = json['name'];
