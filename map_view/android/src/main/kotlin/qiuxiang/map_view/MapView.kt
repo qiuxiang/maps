@@ -19,11 +19,13 @@ import com.tencent.tencentmap.mapsdk.maps.TencentMap
 import com.tencent.tencentmap.mapsdk.maps.model.CameraPosition
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle
 import com.tencent.tencentmap.mapsdk.maps.model.MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER
+import com.tencent.tencentmap.mapsdk.vector.utils.clustering.ClusterManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import kotlin.math.PI
 import com.tencent.tencentmap.mapsdk.maps.MapView as TencentMapView
+
 
 class MapView(
   private val context: Context, val binding: FlutterPluginBinding, id: Int
@@ -37,6 +39,8 @@ class MapView(
   init {
     view.onResume()
     initLocation()
+    val clusterManager = ClusterManager<ClusterItem>(context, map)
+    clusterManager.renderer = ClusterRenderer(context, map, clusterManager)
 
     map.uiSettings.isScrollGesturesEnabled = false
     map.uiSettings.isZoomGesturesEnabled = false
@@ -74,6 +78,7 @@ class MapView(
           val args = call.arguments<List<Float>>()
           map.moveCamera(CameraUpdateFactory.zoomTo(args[0]))
           result.success(null)
+          clusterManager.onCameraChangeFinished(map.cameraPosition)
         }
         "rotate" -> {
           map.moveCamera(CameraUpdateFactory.rotateTo(call.arguments(), map.cameraPosition.tilt))
@@ -108,6 +113,20 @@ class MapView(
         "removeMarker" -> {
           markers[call.arguments]?.remove()
           result.success(null)
+        }
+        "addClusterItems" -> {
+          val items = call.arguments<List<Map<*, *>>>()
+          clusterManager.addItems(items.map {
+            ClusterItem(
+              (it["position"] as Map<*, *>).toLatLng(),
+              (it["asset"] as? String)?.let { i -> binding.flutterAssets.getAssetFilePathByName(i) }
+            )
+          })
+          clusterManager.onCameraChangeFinished(map.cameraPosition)
+        }
+        "clearClusterItems" -> {
+          clusterManager.clearItems()
+          clusterManager.onCameraChangeFinished(map.cameraPosition)
         }
         else -> result.notImplemented()
       }

@@ -10,7 +10,11 @@ abstract class GetxWidget<T> extends StatelessWidget {
 
   final String? tag = null;
 
-  T get state => GetInstance().find<T>(tag: tag)!;
+  T get state => Get.find<T>(tag: tag)!;
+}
+
+mixin GetState<T> {
+  T get state => Get.find<T>()!;
 }
 
 class VerticalSpace extends StatelessWidget {

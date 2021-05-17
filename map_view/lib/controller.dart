@@ -68,6 +68,15 @@ class MapViewController {
     return marker;
   }
 
+  Future<void> addClusterItems(List<ClusterItem> list) {
+    return _channel.invokeMethod(
+        'addClusterItems', list.map((i) => i.toJson()).toList());
+  }
+
+  Future<void> clearClusterItems(List<ClusterItem> list) {
+    return _channel.invokeMethod('clearClusterItems');
+  }
+
   void animateScroll(LatLng target,
       [int duration = 1000, Curve curve = Curves.easeOutCubic]) {
     state.animateScroll(target, duration, curve);

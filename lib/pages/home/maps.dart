@@ -8,7 +8,7 @@ class Maps extends GetxWidget<HomeState> {
   Widget build(BuildContext context) {
     return MapView(
       mapType: context.isDarkMode ? MapType.dark : MapType.normal,
-      onCreated: (controller) => state.mapView = controller,
+      onCreated: state.onCreated,
       onTapPoi: state.onTapPoi,
       onTap: (_) => state.hidePoi(),
       onLongPress: state.onLogPress,

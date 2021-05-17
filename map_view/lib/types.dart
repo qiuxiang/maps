@@ -105,3 +105,19 @@ class MapPoi {
       : position = LatLng.fromJson(json['position']),
         name = json['name'];
 }
+
+class ClusterItem {
+  final LatLng position;
+  final String? asset;
+
+  const ClusterItem(this.position, [this.asset]);
+
+  ClusterItem.fromJson(json)
+      : position = LatLng.fromJson(json['position']),
+        asset = json['asset'];
+
+  Map<String, Object?> toJson() => {
+        'position': position.toJson(),
+        'asset': asset,
+      };
+}

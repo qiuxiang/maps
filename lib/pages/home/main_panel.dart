@@ -6,13 +6,18 @@ class MainPanel extends GetxWidget<HomeState> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(children: [
-        TextField(
+    return Column(children: [
+      const SizedBox(height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TextField(
           focusNode: state.focusNode,
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 18),
+          textInputAction: TextInputAction.search,
+          onChanged: state.onSearchTyping,
           decoration: InputDecoration(
+            hintText: '搜索地点',
+            hintStyle: const TextStyle(fontSize: 18),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             fillColor: context.isDarkMode
                 ? Get.theme.cardColor
@@ -23,10 +28,7 @@ class MainPanel extends GetxWidget<HomeState> {
               builder: (_) {
                 if (state.focusNode.hasFocus) {
                   return CupertinoButton(
-                    onPressed: () {
-                      state.mainPanel.close();
-                      state.focusNode.unfocus();
-                    },
+                    onPressed: state.closeMainPanel,
                     padding: EdgeInsets.zero,
                     child: Icon(Icons.arrow_back,
                         color: Get.textTheme.caption?.color),
@@ -45,7 +47,39 @@ class MainPanel extends GetxWidget<HomeState> {
             ),
           ),
         ),
-      ]),
+      ),
+      const SizedBox(height: 16),
+      const Expanded(child: Suggestions()),
+    ]);
+  }
+}
+
+class Suggestions extends StatelessWidget with GetState<HomeState> {
+  const Suggestions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return ListView.builder(
+        padding: EdgeInsets.zero,
+        itemBuilder: (_, i) => Item(state.suggestions[i]),
+        itemCount: state.suggestions.length,
+      );
+    });
+  }
+}
+
+class Item extends StatelessWidget {
+  final dynamic item;
+
+  Item(this.item);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {},
+      title: Text(item['title']),
+      subtitle: Text(item['address'], maxLines: 1),
     );
   }
 }

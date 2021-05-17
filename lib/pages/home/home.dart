@@ -1,8 +1,8 @@
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../main.dart';
+import 'main_panel.dart';
 import 'maps.dart';
-import 'panel.dart';
 import 'poi.dart';
 import 'state.dart';
 
@@ -82,7 +82,7 @@ class HomePage extends GetxWidget<HomeState> {
                 maxHeight * position + state.panelMinHeight;
           },
           onPanelClosed: () {
-            state.focusNode.unfocus();
+            state.closeMainPanel();
           },
         ),
       ),
