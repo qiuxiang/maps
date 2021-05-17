@@ -12,6 +12,8 @@ class Maps extends GetxWidget<HomeState> {
       onTapPoi: state.onTapPoi,
       onTap: (_) => state.hidePoi(),
       onLongPress: state.onLogPress,
+      onTapMarker: print,
+      onTapClusterItem: print,
     );
   }
 }

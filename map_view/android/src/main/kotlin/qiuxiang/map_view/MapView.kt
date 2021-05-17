@@ -35,12 +35,17 @@ class MapView(
   val map: TencentMap = view.map
   private val channel = MethodChannel(binding.binaryMessenger, "map_view_$id")
   private val markers = HashMap<String, MapViewMarker>()
+  private val clusterItems = mutableListOf<ClusterItem>()
 
   init {
     view.onResume()
     initLocation()
     val clusterManager = ClusterManager<ClusterItem>(context, map)
     clusterManager.renderer = ClusterRenderer(context, map, clusterManager)
+    clusterManager.setOnClusterItemClickListener {
+      channel.invokeMethod("onTapClusterItem", clusterItems.indexOf(it))
+      true
+    }
 
     map.uiSettings.isScrollGesturesEnabled = false
     map.uiSettings.isZoomGesturesEnabled = false
@@ -55,6 +60,12 @@ class MapView(
     }
     map.setOnMapLongClickListener {
       channel.invokeMethod("onLongPress", it.toJson())
+    }
+    map.setOnMarkerClickListener {
+      if (!clusterManager.onMarkerClick(it)) {
+        channel.invokeMethod("onTapMarker", it.id)
+      }
+      true
     }
 
     channel.setMethodCallHandler { call, result ->
@@ -115,16 +126,18 @@ class MapView(
           result.success(null)
         }
         "addClusterItems" -> {
-          val items = call.arguments<List<Map<*, *>>>()
-          clusterManager.addItems(items.map {
+          val items = call.arguments<List<Map<*, *>>>().map {
             ClusterItem(
               (it["position"] as Map<*, *>).toLatLng(),
               (it["asset"] as? String)?.let { i -> binding.flutterAssets.getAssetFilePathByName(i) }
             )
-          })
+          }
+          clusterItems.addAll(items)
+          clusterManager.addItems(items)
           clusterManager.onCameraChangeFinished(map.cameraPosition)
         }
         "clearClusterItems" -> {
+          clusterItems.clear()
           clusterManager.clearItems()
           clusterManager.onCameraChangeFinished(map.cameraPosition)
         }

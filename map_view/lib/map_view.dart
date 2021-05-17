@@ -6,6 +6,7 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 
 import 'controller.dart';
+import 'marker.dart';
 import 'types.dart';
 
 export 'controller.dart';
@@ -33,6 +34,12 @@ class MapView extends StatefulWidget {
   /// 定位改变时调用
   final void Function(Location)? onLocation;
 
+  /// 点击标记时调用
+  final void Function(Marker marker)? onTapMarker;
+
+  /// 点击点聚合标记时调用
+  final void Function(int index)? onTapClusterItem;
+
   const MapView({
     this.mapType = MapType.none,
     this.onCreated,
@@ -40,6 +47,8 @@ class MapView extends StatefulWidget {
     this.onTapPoi,
     this.onLongPress,
     this.onLocation,
+    this.onTapMarker,
+    this.onTapClusterItem,
   });
 
   @override

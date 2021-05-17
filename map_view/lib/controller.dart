@@ -27,6 +27,12 @@ class MapViewController {
         case 'onLocation':
           state.widget.onLocation?.call(Location.fromJson(call.arguments));
           break;
+        case 'onTapMarker':
+          state.widget.onTapMarker?.call(markers[call.arguments]!);
+          break;
+        case 'onTapClusterItem':
+          state.widget.onTapClusterItem?.call(call.arguments);
+          break;
       }
     });
   }
